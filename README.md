@@ -80,3 +80,8 @@ Segue alguns projetos relacionados
 ## Autores
 
 - [@defaultdayanni](https://github.com/defaultdayanni)
+
+
+| Imagem                                                                                  | Nome do Arquivo e Descrição                      |
+|-----------------------------------------------------------------------------------------|--------------------------------------------------|
+| <img src="https://github.com/user-attachments/assets/316751b4-08ee-41ac-81ee-0ef10f4d86ec" width="150px"> | **NodeMCU_V2-Bottom.stl**: Base para acomodar a placa NodeMCU ESP8266. |

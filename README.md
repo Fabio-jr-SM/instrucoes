@@ -1,87 +1,118 @@
-<!-- Você pode encontrar badges aqui: https://github.com/Ileriayo/markdown-badges?tab=readme-ov-file#markdown-badges -->
-![Arduino](https://img.shields.io/badge/-Arduino-00979D?style=for-the-badge&logo=Arduino&logoColor=white)
-![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)
-![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+Instrução de Uso do Código para Comparação de Nomes e Coleta de Telefones
+Pré-requisitos
+Ambiente: O código deve ser executado no Google Colab.
+Pacotes Necessários: Certifique-se de que as bibliotecas pandas e difflib estão instaladas. No Google Colab, elas já estão disponíveis por padrão.
+Estrutura das Planilhas
+Planilha 1 (1chamada_AC_oficial.xlsx):
 
----
+Contém uma coluna chamada "Nome completo".
+Esta planilha deve conter os nomes dos alunos que você deseja verificar.
+Planilha 2 (matriculados.csv):
 
-#  Repositório dos Códigos do ProgramaCÃO
+Contém uma coluna chamada "NOME COMPLETO".
+Esta planilha deve conter os nomes dos alunos que estão matriculados.
+Planilha com Resultados de Não Correspondência:
 
+O resultado da primeira comparação será salvo em um arquivo CSV chamado nao_correspondente.csv, que contém os nomes da primeira planilha que não foram encontrados na segunda.
+Planilha de Nomes Não Inscritos (não_inscrito.csv):
 
-Este repositório contém o código para o projeto **ProgramaCÃO**, que monitora o nível de ração e água utilizando um sensor sônico e envia notificações via Telegram.
+Contém uma coluna chamada "Nomes não correspondentes Planilha 1".
+Esta planilha deve conter os nomes dos alunos que não foram encontrados na segunda planilha.
+Planilha de Inscritos (Inscritos.csv):
 
-## Documentação
+Contém colunas chamadas "Nome Completo:" e "Telefone:".
+Esta planilha deve conter os nomes dos alunos que estão inscritos e seus respectivos telefones.
+Como Usar o Código
+Configuração Inicial:
 
-O projeto foi desenvolvido em C++ para a plataforma Arduino, utilizando bibliotecas específicas. É necessário instalar as versões das bibliotecas compatíveis com o código.
+Certifique-se de que as planilhas estão carregadas no seu Google Drive e os caminhos estão corretamente configurados no código.
+Verifique se os nomes das colunas correspondem exatamente às descrições acima.
+Execução do Código:
 
-## Instalação
+Execute o código completo no Google Colab. O código realiza as seguintes operações:
+Carrega as planilhas de nomes e telefones.
+Compara os nomes da primeira planilha com os da segunda planilha, identificando os que não correspondem.
+Salva os nomes não correspondentes em um arquivo CSV.
+Coleta os telefones correspondentes dos alunos que não foram encontrados e salva em um novo arquivo CSV.
+Resultado:
 
-1. **Instale o Visual Studio**: [Link de download](https://visualstudio.microsoft.com/pt-br/#vs-section)
-2. **Instale o Java**: [Link de download](https://www.java.com/pt-BR/download/ie_manual.jsp?locale=pt_BR)
-3. **Instale o Arduino IDE**: [Link de download](https://www.arduino.cc/en/software)
+Após a execução do código, você encontrará dois arquivos CSV em seu Google Drive:
+nao_correspondente.csv: Contém os nomes da primeira planilha que não foram encontrados na segunda.
+resultados_telefones.csv: Contém os nomes não correspondentes e os respectivos telefones coletados da planilha de inscritos.
+Observações Finais
+Verificação de Erros: Se ocorrerem erros relacionados a nomes não correspondentes ou colunas ausentes, verifique os nomes das colunas nas planilhas.
+Ajustes de Limite: O código utiliza um threshold de 0.8 na função nomes_similares para determinar a similaridade dos nomes. Você pode ajustar esse valor se necessário.
+Uso em Novas Comparações: Para comparar outras chamadas, basta substituir os caminhos das planilhas no código e garantir que as colunas estejam corretamente nomeadas.
+Código para Comparação
+Aqui está o código que você deve executar conforme as instruções:
 
-Estas ferramentas são necessárias para rodar o código do ProgramaCÃO corretamente.
+python
+Copiar código
+from google.colab import drive
+import pandas as pd
+from difflib import SequenceMatcher
 
-## Dependências
+# Montar o Google Drive
+drive.mount('/content/drive')
 
-| Biblioteca               | Versão | Link para Documentação                                  |
-| ------------------------ | ------ | ------------------------------------------------------ |
-| ArduinoJson.h            | ?      | [Link](https://arduinojson.org)                         |
-| ESP8266WiFi.h            | ?      | [Link](https://arduino-esp8266.readthedocs.io)         |
-| UniversalTelegramBot.h   | ?      | [Link](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot) |
-| WiFiClientSecure.h       | ?      | [Link](https://arduino-esp8266.readthedocs.io/en/latest/secureclient.html) |
-| NewPing.h                | ?      | [Link](https://bitbucket.org/teckel12/arduino-new-ping/wiki/Home) |
-| LCDWIKI_KBV.h            | 1.0    | [Link](http://www.lcdwiki.com/3.5inch_Arduino_Display-UNO#Program_Download) |
+# Carregar as planilhas (substitua os caminhos pelos corretos)
+df_planilha1 = pd.read_excel('/content/drive/MyDrive/scripts/1chamada_AC_oficial.xlsx')  # Alunos da primeira planilha
+df_planilha2 = pd.read_csv('/content/drive/MyDrive/scripts/matriculados.csv')  # Alunos da segunda planilha
 
-## Funcionalidades
+# Função para verificar se dois nomes são similares (ignorando maiúsculas e minúsculas)
+def nomes_similares(nome1, nome2, threshold=0.8):
+    if isinstance(nome1, str) and isinstance(nome2, str):
+        return SequenceMatcher(None, nome1.lower(), nome2.lower()).ratio() >= threshold
+    return False  # Retorna False se um dos nomes não for uma string
 
-- Monitoramento do nível de ração
-- Notificações de nível de ração e água via Telegram
-- Notificação crítica para grupo específico
-- Sensor sônico para detectar o nível de ração
-- Integração com o WiFi
+# Obter a coluna de nomes completos
+nomes_planilha1 = df_planilha1["Nome completo"].tolist()
+nomes_planilha2 = df_planilha2["NOME COMPLETO"].tolist()
 
-## Funcionalidades Futuras
+# Encontrar nomes não correspondentes na planilha 1
+nao_correspondentes_planilha1 = [
+    nome for nome in nomes_planilha1
+    if not any(nomes_similares(nome, nome_mat) for nome_mat in nomes_planilha2)
+]
 
-- Integração com API do WhatsApp
+# Encontrar nomes não correspondentes na planilha 2
+nao_correspondentes_planilha2 = [
+    nome for nome in nomes_planilha2
+    if not any(nomes_similares(nome, nome_mat) for nome_mat in nomes_planilha1)
+]
 
-## Projetos Relacionados
+print(nao_correspondentes_planilha1)
+print(nao_correspondentes_planilha2)
 
-Segue alguns projetos relacionados
+# Criar um DataFrame com os nomes não correspondentes
+nao_correspondentes = pd.DataFrame({
+    "Nomes não correspondentes Planilha 1": nao_correspondentes_planilha1
+})
 
-- [Arduino on ESP8266](https://github.com/esp8266/Arduino)
+# Salvar os nomes não correspondentes que estão na primeira chamada e não estão inscritos em um arquivo CSV
+nao_correspondentes.to_csv('/content/drive/MyDrive/scripts/resultados/nao_correspondente.csv', index=False)
 
-## Referência
+# Coletar telefones
+df_nomes = pd.read_csv('/content/drive/MyDrive/scripts/resultados/não_inscrito.csv')  # Planilha com apenas nomes
+df_telefones = pd.read_csv('/content/drive/MyDrive/scripts/Inscritos.csv')  # Planilha com nomes e telefones
 
-- [Java](https://www.java.com/pt-BR/download/ie_manual.jsp?locale=pt_BR) - Necessário para o funcionamento do Arduino IDE
-- [Arduino IDE](https://www.arduino.cc/en/software) - Ambiente de desenvolvimento para Arduino
-- [ArduinoJson](https://arduinojson.org/) - Biblioteca para manipulação de JSON no Arduino
-- [ESP8266WiFi](https://arduino-esp8266.readthedocs.io/) - Biblioteca para conexão WiFi com ESP8266
-- [Universal Telegram Bot](https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot) - Biblioteca para comunicação com o Telegram
-- [WiFiClientSecure](https://arduino-esp8266.readthedocs.io/en/latest/secureclient.html) - Cliente seguro para conexões WiFi
-- [NewPing](https://bitbucket.org/teckel12/arduino-new-ping/wiki/Home) - Biblioteca para uso de sensores ultrassônicos
-- [LCDWIKI_KBV](http://www.lcdwiki.com/3.5inch_Arduino_Display-UNO#Program_Download) - Biblioteca para displays LCD com Arduino
+# Criar uma lista para armazenar os resultados
+resultados = []
 
-## FAQ 
+# Iterar sobre cada nome na planilha de nomes
+for nome in df_nomes["Nomes não correspondentes Planilha 1"]:
+    # Tentar encontrar um telefone correspondente na segunda planilha
+    telefone_encontrado = None
+    for index, row in df_telefones.iterrows():
+        if nomes_similares(nome, row["Nome Completo:"]):  # Verifica se os nomes são similares
+            telefone_encontrado = row["Telefone:"]  # Coleta o telefone correspondente
+            break  # Para de procurar uma vez que o telefone é encontrado
+    resultados.append((nome, telefone_encontrado))  # Adiciona o nome e o telefone à lista de resultados
 
-### Como incluir as placas da família ESP8266 na Arduino IDE?
+# Criar um DataFrame com os resultados
+df_resultados = pd.DataFrame(resultados, columns=["Nome Completo", "Telefone"])
 
-1. Acesse `Arquivo` > `Preferências`
-2. Em `URLs adicionais para gerenciadores de placas`, insira o seguinte link:
-   ```
-   https://arduino.esp8266.com/stable/package_esp8266com_index.json
-   ```
+# Salvar os resultados em um arquivo CSV
+df_resultados.to_csv('/content/drive/MyDrive/scripts/resultados/resultados_telefones.csv', index=False)
 
-### Como encontrar a placa na IDE do Arduino?
-
-1. Vá para `Ferramentas` > `Placa:` > `Gerenciador de Placas`
-2. Pesquise e instale as placas ESP8266.
-
-## Autores
-
-- [@defaultdayanni](https://github.com/defaultdayanni)
-
-
-| Imagem                                                                                  | Nome do Arquivo e Descrição                      |
-|-----------------------------------------------------------------------------------------|--------------------------------------------------|
-| <img src="https://github.com/user-attachments/assets/316751b4-08ee-41ac-81ee-0ef10f4d86ec" width="150px"> | **NodeMCU_V2-Bottom.stl**: Base para acomodar a placa NodeMCU ESP8266. |
+print("Os resultados foram salvos em 'resultados_telefones.csv'.")
